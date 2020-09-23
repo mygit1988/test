@@ -1,0 +1,132 @@
+class logit(object):
+
+    _logfile = 'out.log'
+
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args):
+        log_string = self.func.__name__ + " was called"
+        print(log_string)
+        # Open the logfile and append
+        with open(self._logfile, 'a') as opened_file:
+            # Now we log to the specified logfile
+            opened_file.write(log_string + '\n')
+        # Now, send a notification
+        self.notify_by_email()
+        # return base func
+        return self.func(*args)
+
+
+    def notify_by_email(self):
+        # logit only logs, no more
+        pass
+
+
+@logit
+def myfunc2():
+    pass
+
+myfunc2()
+# Output: myfunc1 was called
+########################################################################################
+"""def addone(myfunc):
+    def addoneinside():
+        return myfunc() + 1
+    return addoneinside()
+
+def oldfunc():
+    return 3
+
+old = addone(oldfunc)
+print(old)
+
+#--------------------------------------------------------------------------------------------------------
+
+def addone(oldfunc):
+    def addoneinside():
+        return oldfunc() + 1
+    return addoneinside()
+
+@addone
+def oldfunc():
+    return 3
+
+old = oldfunc()
+print(old)
+"""
+#-------------------------------------------------------------------------------------
+"""
+from functools import wraps
+def logit(func):
+    @wraps(func)
+    def with_logging(*args, **kwargs):
+        print(func.__name__ + " was called ", "with the arguments args: ", args, ' and kwargs: ', kwargs)
+        return func(*args, **kwargs)
+    return with_logging
+
+@logit
+def addition_func(x):
+   #Do some math.
+   return x + x
+
+
+result = addition_func(4)
+# Output: addition_func was called
+"""
+###############################################################################
+from functools import wraps
+
+def logit(logfile='info.log'):
+    def logging_decorator(func, *args, **kwargs):
+        @wraps(func)
+        def wrapped_function(*args, **kwargs):
+            log_string = func.__name__ + " was called with args:" + str(args) + " and kwargs: " + str(kwargs)
+            print(log_string)
+            # Open the logfile and append
+            print("locals: ", locals())
+            print("globals: ", globals())
+            with open(logfile, 'a') as opened_file:
+                # Now we log to the specified logfile
+                opened_file.write(log_string + '\n')
+                opened_file.close()
+            return func(*args, **kwargs)
+        return wrapped_function
+    return logging_decorator
+
+
+@logit(logfile='info.log')
+def infologger(*args, **kwargs):
+    return
+
+
+@logit(logfile='error.log')
+def errorlogger(*args, **kwargs):
+    pass
+
+if __name__=="__main__":
+    infologger(func_name='function1')
+    # A file called info.log now exists, with the string
+    # func.__name__ + " was called with args:" + str(args) + " and kwargs: " + str(kwargs)
+    errorlogger(func_name="function2")
+    # A file called error.log now exists, with the string
+    #func.__name__ + " was called with args:" + str(args) + " and kwargs: " + str(kwargs)
+
+#################################################################################################
+from functools import wraps
+
+def logit(func):
+    @wraps(func)
+    def with_logging(*args, **kwargs):
+        print(func.__name__ + " was called")
+        return func(*args, **kwargs)
+    return with_logging
+
+@logit
+def addition_func(x):
+   """Do some math."""
+   return x + x
+
+
+result = addition_func(4)
+# Output: addition_func was called
